@@ -1,3 +1,7 @@
+# GENERATED CODE - DO NOT EDIT IN homebrew-racket.
+# Source of truth: /Users/cutiedeng/Y2026/M06/D21/package-racket
+# Humans and LLM agents must change package-racket and regenerate; manual tap edits are not production-safe.
+
 name: brew test-bot
 
 on:
@@ -46,4 +50,9 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: bottles_${{ matrix.os }}
-          path: '*.bottle.*'
+          path: |
+            *.bottle.json
+            *.bottle*.tar.gz
+            **/*.bottle.json
+            **/*.bottle*.tar.gz
+          if-no-files-found: error

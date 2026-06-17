@@ -1,20 +1,17 @@
+# GENERATED CODE - DO NOT EDIT IN homebrew-racket.
+# Source of truth: /Users/cutiedeng/Y2026/M06/D21/package-racket
+# Humans and LLM agents must change package-racket and regenerate; manual tap edits are not production-safe.
+
 class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
   sha256 "b9c621e5c91822181cff1b1af8813a5abd3e89795089171552dac0f441222bbd"
+  version "9.2.1.1"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
-    rebuild 2
-    sha256 arm64_tahoe:  "0169b4432a67a3717d7cefe0cbd787cfc9c55000a6243d13074069bca2e5345d"
-    sha256 arm64_linux:  "8434407bbf40c6393807d236122d685af9f855b8238258f7e783fc8d2c0bcc16"
-    sha256 x86_64_linux: "4956f7780f61fed711f53422c7c1875245beff41633dd083cd6d025173a7dc6f"
   end
 
   depends_on "openssl@3"
