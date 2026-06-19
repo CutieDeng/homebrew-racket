@@ -2,7 +2,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "71e89d2661b7295349c04f709b6c829ee2267bf9906f757a408970f3cce621a1"
+  sha256 "233d99ad7d9d9caf5c88d510180a6a78f901d41181a5f298861c305fead42bdc"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -90,6 +90,9 @@ class RacketAT9 < Formula
   end
 
   test do
+    require "pty"
+    require "timeout"
+
     assert_match "9.2.1", shell_output("#{bin}/racket -e '(displayln (version))'")
 
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
@@ -101,6 +104,26 @@ class RacketAT9 < Formula
 
     output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
     assert_match /^> "hi"$/, output
+
+    pty_output = +""
+    Timeout.timeout(5) do
+      PTY.spawn("#{bin}/racket") do |r, w, pid|
+        begin
+          pty_output << r.gets
+          pty_output << r.readpartial(2)
+          w.puts "(= 1 1)"
+          pty_output << r.gets
+          pty_output << r.gets
+        ensure
+          w.write "\x04" rescue nil
+          Process.kill("TERM", pid) rescue nil
+          Process.wait(pid) rescue nil
+        end
+      end
+    end
+    assert_match "Welcome to Racket v9.2.1 [cs].", pty_output
+    assert_match "\n> (= 1 1)", pty_output
+    assert_match "\n#t", pty_output
 
     assert_match '(default-scope . "installation")', racket_config.read
 
