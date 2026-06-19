@@ -95,9 +95,7 @@ class RacketAT9 < Formula
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
 
-    output = shell_output("'#{bin}/raco' pkg config")
-    assert $CHILD_STATUS.success?
-    assert_match "default-scope:\n installation", output
+    assert_match '(default-scope . "installation")', racket_config.read
 
     if OS.mac?
       output = shell_output("DYLD_PRINT_LIBRARIES=1 #{bin}/racket -e '(require openssl)' 2>&1")
