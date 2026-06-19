@@ -2,7 +2,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "e2058689ccc65280bfbd58aa7016632982da72f90949e07766cf2a3e9ac84765"
+  sha256 "71e89d2661b7295349c04f709b6c829ee2267bf9906f757a408970f3cce621a1"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -94,6 +94,13 @@ class RacketAT9 < Formula
 
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
+
+    output = shell_output("printf '1\\n' | #{bin}/racket")
+    assert_match "Welcome to Racket v9.2.1 [cs].", output
+    assert_match /^> 1$/, output
+
+    output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
+    assert_match /^> "hi"$/, output
 
     assert_match '(default-scope . "installation")', racket_config.read
 
