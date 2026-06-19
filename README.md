@@ -25,9 +25,20 @@ tap "cutiedeng/racket"
 brew "racket@9"
 ```
 
-`racket@9` is keg-only, so it does not replace another `racket` on PATH
-automatically. Use `/opt/homebrew/opt/racket@9/bin/racket` directly or add
-that directory to PATH when this build should be the active Racket.
+`racket@9` is intended to provide the active Homebrew `racket` and `raco`
+commands. If an official Racket formula or cask is already installed, remove it
+before installing this formula:
+
+```sh
+brew uninstall minimal-racket
+brew uninstall --cask racket
+```
+
+If only a linked formula is in the way, unlinking it is also enough:
+
+```sh
+brew unlink minimal-racket
+```
 
 ## Release Checklist
 

@@ -9,8 +9,6 @@ class RacketAT9 < Formula
     skip "Private Racket fork releases are managed manually"
   end
 
-  keg_only :versioned_formula
-
   depends_on "openssl@3"
 
   uses_from_macos "libffi"
@@ -81,12 +79,13 @@ class RacketAT9 < Formula
 
   def caveats
     <<~EOS
-      This is a versioned private Racket build. It is keg-only and will not
-      replace an existing `racket` or `raco` on PATH automatically.
+      This formula is intended to provide the active Homebrew `racket` and
+      `raco` commands.
 
-      To use this build directly:
-        #{opt_bin}/racket
-        #{opt_bin}/raco
+      If an official Racket formula or cask is already installed, remove it
+      before installing this formula:
+        brew uninstall minimal-racket
+        brew uninstall --cask racket
     EOS
   end
 
