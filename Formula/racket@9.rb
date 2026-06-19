@@ -2,7 +2,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "e6fe9f6cba71d0b29f006fda19ec1274734ba0475ed3321ad39e4c505485ea7e"
+  sha256 "7c465fb85f7f838d5cd1354d56e66515c14bd5b2c4ac0038947e749e80e2e2d7"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -98,32 +98,58 @@ class RacketAT9 < Formula
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
 
+    (testpath/"interactive-packages.rkt").write <<~RACKET
+      #lang racket/base
+      (for ([p '(("main.rkt" "xrepl")
+                 ("main.rkt" "expeditor")
+                 ("pread.rkt" "readline"))])
+        (unless (collection-file-path (car p) (cadr p) #:fail (lambda _ #f))
+          (error (cadr p) "collection missing")))
+      (displayln "interactive-packages-ok")
+    RACKET
+    output = shell_output("#{bin}/racket #{testpath/"interactive-packages.rkt"}")
+    assert_match "interactive-packages-ok", output
+
     output = shell_output("printf '1\\n' | #{bin}/racket")
     assert_match "Welcome to Racket v9.2.1 [cs].", output
-    assert_match /^> 1$/, output
+    assert_match(/^> 1$/, output)
 
     output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
-    assert_match /^> "hi"$/, output
+    assert_match(/^> "hi"$/, output)
 
     pty_output = +""
+    read_available = lambda do |reader, timeout|
+      loop do
+        pty_output << Timeout.timeout(timeout) { reader.readpartial(4096) }
+        timeout = 0.1
+      end
+    rescue Timeout::Error, EOFError
+      pty_output
+    end
+    read_until_result = lambda do |reader|
+      loop do
+        pty_output << Timeout.timeout(0.5) { reader.readpartial(4096) }
+        break if pty_output.include?("#t")
+      end
+    rescue Timeout::Error, EOFError
+      pty_output
+    end
     Timeout.timeout(5) do
-      PTY.spawn("#{bin}/racket") do |r, w, pid|
-        begin
-          pty_output << r.gets
-          pty_output << r.readpartial(2)
-          w.puts "(= 1 1)"
-          pty_output << r.gets
-          pty_output << r.gets
-        ensure
-          w.write "\x04" rescue nil
-          Process.kill("TERM", pid) rescue nil
-          Process.wait(pid) rescue nil
-        end
+      PTY.spawn({ "TERM" => "xterm-256color" }, "#{bin}/racket") do |r, w, pid|
+        read_available.call(r, 0.5)
+        w.write "\n"
+        read_available.call(r, 0.5)
+        w.puts "(= 1 1)"
+        read_until_result.call(r)
+        w.write "\x04"
+        Process.kill("KILL", pid)
+        Process.detach(pid)
       end
     end
     assert_match "Welcome to Racket v9.2.1 [cs].", pty_output
-    assert_match "\n> (= 1 1)", pty_output
     assert_match "\n#t", pty_output
+    assert_match(/\e\[/, pty_output)
+    assert !pty_output.match?(/> \r?\n\(/), "empty input fell back to the plain REPL reader"
 
     assert_match '(default-scope . "installation")', racket_config.read
 
