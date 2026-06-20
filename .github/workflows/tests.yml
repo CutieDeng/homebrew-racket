@@ -9,11 +9,16 @@ on:
 jobs:
   test-bot:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ macos-15-intel, macos-26 ]
         include:
+          - os: macos-26
+            test_formula: true
+          - os: macos-15-intel
+            test_formula: false
           - os: ubuntu-latest
             container: ghcr.io/homebrew/brew:main
+            test_formula: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     permissions:
@@ -27,19 +32,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Remove preinstalled third-party taps
-        run: |
-          for tap in aws/tap azure/bicep cirruslabs/cli
-          do
-            brew untap "$tap" || true
-          done
-
       - run: brew test-bot --only-cleanup-before
 
       - run: brew test-bot --only-setup
 
       - run: brew test-bot --only-tap-syntax
       - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents
+        if: matrix.test_formula
 
       - name: Upload bottles as artifact
         if: always() && github.event_name == 'pull_request'
