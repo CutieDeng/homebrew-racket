@@ -21,6 +21,7 @@ class RacketAT9 < Formula
   uses_from_macos "libffi"
 
   on_linux do
+    depends_on "libedit"
     depends_on "zlib-ng-compat"
   end
 
@@ -155,7 +156,11 @@ class RacketAT9 < Formula
     end
     assert_match "Welcome to Racket v9.2.1 [cs].", pty_output
     assert_match "\n#t", pty_output
-    assert_match(/\e\[/, pty_output)
+    if OS.mac?
+      assert_match(/\e\[/, pty_output)
+    else
+      refute_match(/no readline support/, pty_output)
+    end
     assert !pty_output.match?(/> \r?\n\(/), "empty input fell back to the plain REPL reader"
 
     assert_match '(default-scope . "installation")', racket_config.read
