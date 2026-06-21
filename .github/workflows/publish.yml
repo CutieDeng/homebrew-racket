@@ -99,5 +99,13 @@ jobs:
           fi
 
           git add Formula/racket@9.rb
-          git commit -m '(BUILD "Update racket@9 bottles" () "Update Homebrew bottle metadata. [skip bottles]")'
+          git commit -F - <<'COMMIT_MESSAGE'
+          (BUILD "Update racket@9 bottles"
+
+          ((managed-by ci)
+           (workflow "brew publish bottles")
+           (operation update-bottle-metadata))
+          "Update Homebrew bottle metadata. [skip bottles]"
+          )
+          COMMIT_MESSAGE
           git push origin HEAD:main
