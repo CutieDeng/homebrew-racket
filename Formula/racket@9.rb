@@ -2,18 +2,11 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "6ba2b56440698211349012976683aaf202ffa1e286c2697872ebff6b9490cca8"
+  sha256 "b9c621e5c91822181cff1b1af8813a5abd3e89795089171552dac0f441222bbd"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "9dcc1ed0e90d74195ce959e5e2bcc8118dd22dc7a3b76a16ffb4caf0a683d28e"
-    sha256 x86_64_linux: "206e03b56657e2a3fac43af131fc9dcdadfc0163f1756032e87daf647382b473"
   end
 
   depends_on "openssl@3"
