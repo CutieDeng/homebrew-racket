@@ -102,9 +102,7 @@ jobs:
           git commit -F - <<'COMMIT_MESSAGE'
           (BUILD "Update racket@9 bottles"
 
-          ((managed-by ci)
-           (workflow "brew publish bottles")
-           (operation update-bottle-metadata))
+          ((CI "brew publish bottles" update-bottle-metadata))
           "Update Homebrew bottle metadata. [skip bottles]"
           )
           COMMIT_MESSAGE
