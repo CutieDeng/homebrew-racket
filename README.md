@@ -42,19 +42,19 @@ brew unlink minimal-racket
 
 ## Release Checklist
 
-Generate the source artifact from the Racket checkout:
+Generate the source artifact and Formula from the packaging project:
 
 ```sh
-/path/to/racket.git/racket/bin/racket racket-to-brew-tgz.rkt \
+racket package-racket.rkt \
+  --target brew \
   --racket-root /path/to/racket.git \
-  --artifact-dir artifacts \
-  --stage-dir .build/racket-to-brew-tgz-stage \
-  --formula Formula/racket@9.rb
+  --homebrew-tap /opt/homebrew/Library/Taps/cutiedeng/homebrew-racket \
+  --bottle-root-url https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
 ```
 
-The command also updates `Formula/racket@9.rb` with the generated source
-URL and sha256. Before validating the formula, upload the generated source
-artifact:
+The command writes `artifacts/racket-minimal-9.2.1-src.tgz` in the packaging
+project and replaces `Formula/racket@9.rb` in this tap after validation. Before
+validating the formula, upload the generated source artifact:
 
 ```text
 https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz

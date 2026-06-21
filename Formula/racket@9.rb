@@ -2,7 +2,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "5d97a96f104772b98e794d2c65b9734c56f9517a42dfac0c2b95b81c53a2cbcd"
+  sha256 "c43d5da5b14859285b3f685e134ba9f5880f0f376dce1d5f06117e4799919198"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -10,7 +10,7 @@ class RacketAT9 < Formula
   end
 
   bottle do
-    root_url "https://github.com/CutieDeng/racket/releases/download/v9.2.1"
+    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
     rebuild 1
     sha256 arm64_tahoe:  "9dcc1ed0e90d74195ce959e5e2bcc8118dd22dc7a3b76a16ffb4caf0a683d28e"
     sha256 x86_64_linux: "206e03b56657e2a3fac43af131fc9dcdadfc0163f1756032e87daf647382b473"

@@ -1,20 +1,53 @@
-name: brew pr-pull
+name: brew publish bottles
 
 on:
-  pull_request_target:
-    types:
-      - labeled
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  pr-pull:
-    if: contains(github.event.pull_request.labels.*.name, 'pr-pull')
+  build-bottles:
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[skip bottles]') == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-26
+          - os: ubuntu-latest
+            container: ghcr.io/homebrew/brew:main
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: brew test-bot --only-cleanup-before
+
+      - run: brew test-bot --only-setup
+
+      - run: brew test-bot --only-tap-syntax
+
+      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
+
+      - name: Upload bottles as artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: bottles_${{ matrix.os }}
+          path: '*.bottle.*'
+
+  publish-bottles:
+    needs: build-bottles
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[skip bottles]') == false
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      checks: read
       contents: write
-      issues: read
-      pull-requests: write
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@main
@@ -24,19 +57,47 @@ jobs:
       - name: Set up git
         uses: Homebrew/actions/git-user-config@main
 
-      - name: Pull bottles
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PULL_REQUEST: ${{ github.event.pull_request.number }}
-        run: brew pr-pull --debug --tap="$GITHUB_REPOSITORY" --root-url="https://github.com/CutieDeng/racket/releases/download/v9.2.1" "$PULL_REQUEST"
-
-      - name: Push commits
-        uses: Homebrew/actions/git-try-push@main
+      - name: Download bottle artifacts
+        uses: actions/download-artifact@v6
         with:
-          branch: main
+          pattern: bottles_*
+          path: bottles
+          merge-multiple: true
 
-      - name: Delete branch
-        if: github.event.pull_request.head.repo.fork == false
+      - name: Publish bottles and update Formula
         env:
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: git push --delete origin "$BRANCH"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
+          RELEASE_TAG: v9.2.1
+        run: |
+          set -euo pipefail
+
+          mapfile -t bottle_jsons < <(find "$GITHUB_WORKSPACE/bottles" -name '*.bottle.json' -type f | sort)
+          mapfile -t bottle_tarballs < <(find "$GITHUB_WORKSPACE/bottles" -name '*.bottle.tar.gz' -type f | sort)
+
+          if [ "${#bottle_jsons[@]}" -eq 0 ]; then
+            echo "No bottle JSON files were produced."
+            exit 1
+          fi
+
+          if [ "${#bottle_tarballs[@]}" -eq 0 ]; then
+            echo "No bottle tarballs were produced."
+            exit 1
+          fi
+
+          gh release view "$RELEASE_TAG" >/dev/null
+
+          cd "$(brew --repository "$GITHUB_REPOSITORY")"
+          brew bottle --merge --write --no-commit --root-url="$BOTTLE_ROOT_URL" "${bottle_jsons[@]}"
+
+          gh release upload "$RELEASE_TAG" "${bottle_tarballs[@]}" --clobber
+
+          if git diff --quiet -- Formula/racket@9.rb; then
+            echo "Formula bottle block is already current."
+            exit 0
+          fi
+
+          git add Formula/racket@9.rb
+          git commit -m '(BUILD "Update racket@9 bottles") [skip bottles]'
+          git push origin HEAD:main
