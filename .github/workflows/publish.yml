@@ -36,9 +36,11 @@ jobs:
       - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
 
       - name: List bottle files
+        shell: bash
         run: |
           set -euo pipefail
-          find "$GITHUB_WORKSPACE" -maxdepth 3 \( -name '*.bottle.json' -o -name '*.bottle*.tar.gz' \) -type f -print | sort
+          pwd
+          find . -maxdepth 3 \( -name '*.bottle.json' -o -name '*.bottle*.tar.gz' \) -type f -print | sort
 
       - name: Upload bottles as artifact
         uses: actions/upload-artifact@v6
@@ -75,6 +77,7 @@ jobs:
           merge-multiple: true
 
       - name: Publish bottles and update Formula
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
