@@ -99,5 +99,5 @@ jobs:
           fi
 
           git add Formula/racket@9.rb
-          git commit -m '(BUILD "Update racket@9 bottles") [skip bottles]'
+          git commit -m '(BUILD "Update racket@9 bottles" () "Update Homebrew bottle metadata. [skip bottles]")'
           git push origin HEAD:main
