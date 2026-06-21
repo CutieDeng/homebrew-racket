@@ -2,7 +2,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  sha256 "c43d5da5b14859285b3f685e134ba9f5880f0f376dce1d5f06117e4799919198"
+  sha256 "6ba2b56440698211349012976683aaf202ffa1e286c2697872ebff6b9490cca8"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -22,6 +22,7 @@ class RacketAT9 < Formula
 
   on_linux do
     depends_on "libedit"
+    depends_on "ncurses"
     depends_on "zlib-ng-compat"
   end
 
