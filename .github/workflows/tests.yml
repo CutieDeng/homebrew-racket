@@ -14,10 +14,10 @@ jobs:
         include:
           - os: macos-26
             test_formula: true
-          - os: macos-15-intel
-            test_formula: false
           - os: ubuntu-latest
+            test_formula: true
             container: ghcr.io/homebrew/brew:main
+          - os: macos-15-intel
             test_formula: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -37,7 +37,8 @@ jobs:
       - run: brew test-bot --only-setup
 
       - run: brew test-bot --only-tap-syntax
-      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents
+
+      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/racket/releases/download/v9.2.1
         if: matrix.test_formula
 
       - name: Upload bottles as artifact
