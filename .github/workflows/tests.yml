@@ -14,6 +14,9 @@ jobs:
           - os: ubuntu-latest
             test_formula: true
             container: ghcr.io/homebrew/brew:main
+          - os: ubuntu-24.04-arm
+            test_formula: true
+            container: ghcr.io/homebrew/brew:main
           - os: macos-15-intel
             test_formula: false
     runs-on: ${{ matrix.os }}
