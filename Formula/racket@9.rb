@@ -6,8 +6,8 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  version "9.2.1.2"
-  sha256 "b9c621e5c91822181cff1b1af8813a5abd3e89795089171552dac0f441222bbd"
+  version "9.2.1.3"
+  sha256 "8000263185bdf872f299fe0dfc072cb1a5782995aae52f753e176c158d556166"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -51,15 +51,15 @@ class RacketAT9 < Formula
         --enable-useprefix
       ]
 
-      ENV["LDFLAGS"] = "-rpath #{Formula["openssl@3"].opt_lib}"
-      ENV["LDFLAGS"] = "-Wl,-rpath=#{Formula["openssl@3"].opt_lib}" if OS.linux?
+      ENV["LDFLAGS"] = "-rpath #{formula_opt_lib("openssl@3")}"
+      ENV["LDFLAGS"] = "-Wl,-rpath=#{formula_opt_lib("openssl@3")}" if OS.linux?
 
       system "./configure", *args
       system "make"
       system "make", "install"
 
       if OS.mac?
-        openssl = Formula["openssl@3"]
+        openssl_opt_lib = formula_opt_lib("openssl@3")
         racket_libdir = lib/"racket"
 
         %w[libssl.3.dylib libcrypto.3.dylib].each do |dylib|
@@ -67,21 +67,25 @@ class RacketAT9 < Formula
           path.unlink if path.exist?
         end
 
-        ln_s openssl.opt_lib/"libssl.3.dylib",    racket_libdir/"libssl.3.dylib"
-        ln_s openssl.opt_lib/"libcrypto.3.dylib", racket_libdir/"libcrypto.3.dylib"
+        ln_s openssl_opt_lib/"libssl.3.dylib",    racket_libdir/"libssl.3.dylib"
+        ln_s openssl_opt_lib/"libcrypto.3.dylib", racket_libdir/"libcrypto.3.dylib"
       end
     end
 
-    inreplace racket_config, prefix, opt_prefix
+    inreplace racket_config,
+              /\(compiled-file-roots \. \(same ("[^"]+")\)\)/,
+              '(compiled-file-roots . (\1))'
+    system bin/"raco", "setup", "--no-user"
+    prune_build_compile_cache
   end
 
   def post_install
-    system bin/"raco", "setup"
+    system bin/"raco", "setup", "--no-user"
+    prune_build_compile_cache
+  end
 
-    return unless racket_config.read.include?(HOMEBREW_CELLAR)
-
-    ohai "Fixing up Cellar references in #{racket_config}..."
-    inreplace racket_config, %r{#{Regexp.escape(HOMEBREW_CELLAR)}/racket@9/[^/]+}o, opt_prefix
+  def prune_build_compile_cache
+    rm_r Dir["#{lib}/racket/compiled/**/ephemeral"]
   end
 
   def caveats
@@ -101,8 +105,6 @@ class RacketAT9 < Formula
     require "timeout"
 
     assert_match "9.2.1", shell_output("#{bin}/racket -e '(displayln (version))'")
-
-
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
 
@@ -117,6 +119,19 @@ class RacketAT9 < Formula
     RACKET
     output = shell_output("#{bin}/racket #{testpath/"interactive-packages.rkt"}")
     assert_match "interactive-packages-ok", output
+
+    (testpath/"rhombus-smoke.rhm").write <<~RHOMBUS
+      #lang rhombus
+      println("rhombus-lang-ok")
+    RHOMBUS
+    output = shell_output("#{bin}/racket #{testpath/"rhombus-smoke.rhm"}")
+    assert_match "rhombus-lang-ok", output
+
+    output = shell_output("#{bin}/rhombus --version")
+    assert_match "Welcome to Rhombus v1.0", output
+
+    output = shell_output("#{bin}/rhombus -e '1 + 2'")
+    assert_match "3", output
 
     output = shell_output("printf '1\\n' | #{bin}/racket")
     assert_match "Welcome to Racket v9.2.1 [cs].", output
@@ -166,7 +181,7 @@ class RacketAT9 < Formula
       assert_match(%r{.*openssl@3/.*/libssl.*\.dylib}, output)
     else
       output = shell_output("LD_DEBUG=libs #{bin}/racket -e '(require openssl)' 2>&1")
-      assert_match "init: #{Formula["openssl@3"].opt_lib/shared_library("libssl")}", output
+      assert_match "init: #{formula_opt_lib("openssl@3")/shared_library("libssl")}", output
     end
   end
 end
