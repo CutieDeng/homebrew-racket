@@ -6,20 +6,12 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  version "9.2.1.1"
+  version "9.2.1.2"
   sha256 "b9c621e5c91822181cff1b1af8813a5abd3e89795089171552dac0f441222bbd"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "3f6114c0a83c37f72f49836ff15fdc343210ae693c41413e680bc3e01ada610d"
-    sha256 arm64_linux:  "feab271cf0a7feb317bec9d2f368e129aac272e44339dbdef3304cf99498f3be"
-    sha256 x86_64_linux: "9c295b0a5d1622d0c6849b752e9fb975f45ce97eaf5165aa19ce0307aabbf5ba"
   end
 
   depends_on "openssl@3"
@@ -109,6 +101,7 @@ class RacketAT9 < Formula
     require "timeout"
 
     assert_match "9.2.1", shell_output("#{bin}/racket -e '(displayln (version))'")
+
 
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
