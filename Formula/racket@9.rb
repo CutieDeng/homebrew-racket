@@ -1,5 +1,5 @@
 # GENERATED CODE - DO NOT EDIT IN homebrew-racket.
-# Source of truth: /Users/cutiedeng/Y2026/M06/D21/package-racket
+# Source of truth: https://github.com/CutieDeng/package-racket
 # Humans and LLM agents must change package-racket and regenerate; manual tap edits are not production-safe.
 
 class RacketAT9 < Formula
@@ -7,19 +7,11 @@ class RacketAT9 < Formula
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
   version "9.2.1.3"
-  sha256 "8000263185bdf872f299fe0dfc072cb1a5782995aae52f753e176c158d556166"
+  sha256 "81792a368e4317d67fa4bcd1463f38262deb8e012ad21a8e4e28aca7aaa46850"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "af26b01fd5e59fc431fa216080f2f4461e21256da6af4de7409a519732a714d3"
-    sha256 arm64_linux:  "84b1943fa8e8b32a37dd380ca87b00691f4881fbf9bd37cf84d9cec479180266"
-    sha256 x86_64_linux: "2610ee8ff289a088ffbbd51e4b15a974dedc7932f817653c02e0002474d4d327"
   end
 
   depends_on "openssl@3"
@@ -41,7 +33,7 @@ class RacketAT9 < Formula
 
   def install
     # Configure racket's package tool (raco) to use installation scope.
-    inreplace "etc/config.rktd", /\)\)\n$/, ") (default-scope . \"installation\"))\n"
+    inreplace "etc/config.rktd", /\)\)\n$/, ") (default-scope . \"installation\") (compiled-file-cache-roots . (user system)) (compiled-file-system-cache-root . \"#{var}/cache/racket/compiled\"))\n"
 
     # Prefer Homebrew OpenSSL 3 over older OpenSSL variants.
     inreplace %w[libssl.rkt libcrypto.rkt].map { |file| buildpath/"collects/openssl"/file },
@@ -52,6 +44,7 @@ class RacketAT9 < Formula
         --disable-debug
         --disable-dependency-tracking
         --enable-origtree=no
+        --enable-sharezo
         --enable-macprefix
         --prefix=#{prefix}
         --mandir=#{man}
@@ -80,20 +73,17 @@ class RacketAT9 < Formula
       end
     end
 
-    inreplace racket_config,
-              /\(compiled-file-roots \. \(same ("[^"]+")\)\)/,
-              '(compiled-file-roots . (\1))'
-    system bin/"raco", "setup", "--no-user"
-    prune_build_compile_cache
+    system bin/"raco", "setup", "--no-user", "--no-zo"
+    remove_precompiled_cache
   end
 
   def post_install
-    system bin/"raco", "setup", "--no-user"
-    prune_build_compile_cache
+    system bin/"raco", "setup", "--no-user", "--no-zo"
+    remove_precompiled_cache
   end
 
-  def prune_build_compile_cache
-    rm_r Dir["#{lib}/racket/compiled/**/ephemeral"]
+  def remove_precompiled_cache
+    rm_rf Dir["#{prefix}/**/compiled"]
   end
 
   def caveats

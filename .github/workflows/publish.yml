@@ -1,5 +1,5 @@
 # GENERATED CODE - DO NOT EDIT IN homebrew-racket.
-# Source of truth: /Users/cutiedeng/Y2026/M06/D21/package-racket
+# Source of truth: https://github.com/CutieDeng/package-racket
 # Humans and LLM agents must change package-racket and regenerate; manual tap edits are not production-safe.
 
 name: brew publish bottles
