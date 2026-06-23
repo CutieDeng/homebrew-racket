@@ -102,7 +102,6 @@ class RacketAT9 < Formula
 
     assert_match "9.2.1", shell_output("#{bin}/racket -e '(displayln (version))'")
 
-
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
 
