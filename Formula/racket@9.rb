@@ -88,7 +88,7 @@ class RacketAT9 < Formula
   end
 
   def remove_precompiled_cache
-    rm_r Dir["#{prefix}/**/compiled"]
+    rm_r Dir["#{prefix}/**/compiled"].sort_by(&:length).reverse
   end
 
   def caveats
