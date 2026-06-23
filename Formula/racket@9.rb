@@ -6,8 +6,8 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  version "9.2.1.4"
-  sha256 "81792a368e4317d67fa4bcd1463f38262deb8e012ad21a8e4e28aca7aaa46850"
+  version "9.2.1.5"
+  sha256 "133e445460bf21862eeae9314441711f109ba4ca7561c17c7d2132a0eaf012fc"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -33,7 +33,12 @@ class RacketAT9 < Formula
 
   def install
     # Configure racket's package tool (raco) to use installation scope.
-    inreplace "etc/config.rktd", /\)\)\n$/, ") (default-scope . \"installation\") (compiled-file-cache-roots . (user system)) (compiled-file-system-cache-root . \"#{var}/cache/racket/compiled\"))\n"
+    config_entries = [
+      "(default-scope . \"installation\")",
+      "(compiled-file-cache-roots . (user system))",
+      "(compiled-file-system-cache-root . \"#{var}/cache/racket/compiled\")",
+    ].join(" ")
+    inreplace "etc/config.rktd", /\)\)\n$/, ") " + config_entries + ")\n"
 
     # Prefer Homebrew OpenSSL 3 over older OpenSSL variants.
     inreplace %w[libssl.rkt libcrypto.rkt].map { |file| buildpath/"collects/openssl"/file },
@@ -83,7 +88,7 @@ class RacketAT9 < Formula
   end
 
   def remove_precompiled_cache
-    rm_rf Dir["#{prefix}/**/compiled"]
+    rm_r Dir["#{prefix}/**/compiled"]
   end
 
   def caveats
