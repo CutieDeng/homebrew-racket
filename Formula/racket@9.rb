@@ -6,20 +6,12 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz"
-  version "9.2.1.5"
+  version "9.2.1.6"
   sha256 "133e445460bf21862eeae9314441711f109ba4ca7561c17c7d2132a0eaf012fc"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "63c0a96cd3152e3b9ab9f35a8808ff8bdc160df3a1f970f4de244d7820fb236c"
-    sha256 arm64_linux:  "a7f6cd6f4cf7e0360e96a5ccc8d1473ebb57bf716c87a2d6b4eeb4ace5b24ded"
-    sha256 x86_64_linux: "52adcbee29ce9c594eeff97c897c504b38234307dd359201808a68e83be19d0d"
   end
 
   depends_on "openssl@3"
@@ -44,7 +36,7 @@ class RacketAT9 < Formula
     config_entries = [
       "(default-scope . \"installation\")",
       "(compiled-file-cache-roots . (user system))",
-      "(compiled-file-system-cache-root . \"#{var}/cache/racket/compiled\")",
+      "(compiled-file-system-cache-root . \"#{prefix}/var/cache/racket/compiled\")",
     ].join(" ")
     inreplace "etc/config.rktd", /\)\)\n$/, ") " + config_entries + ")\n"
 
@@ -91,8 +83,7 @@ class RacketAT9 < Formula
   end
 
   def post_install
-    system bin/"raco", "setup", "--no-user", "--no-zo"
-    remove_precompiled_cache
+    system bin/"raco", "setup", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
   end
 
   def remove_precompiled_cache
@@ -118,6 +109,15 @@ class RacketAT9 < Formula
     assert_match "9.2.1", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
+    assert !Dir["#{prefix}/var/cache/racket/compiled/**/*.zo"].empty?, "system compiled cache is empty"
+
+    empty_home = testpath/"empty-home"
+    empty_home.mkpath
+    output = shell_output(
+      "HOME=#{empty_home} #{bin}/racket " \
+      "-e '(require racket/list racket/match racket/file) (displayln \"brew-empty-home-ok\")'",
+    )
+    assert_match "brew-empty-home-ok", output
 
     (testpath/"interactive-packages.rkt").write <<~RACKET
       #lang racket/base
