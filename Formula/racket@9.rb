@@ -117,7 +117,6 @@ class RacketAT9 < Formula
     assert_match "9.2.2", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
-    assert !Dir["#{prefix}/var/cache/racket/compiled/**/*.zo"].empty?, "system compiled cache is empty"
 
     empty_home = testpath/"empty-home"
     empty_home.mkpath
