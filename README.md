@@ -49,21 +49,21 @@ racket package-racket.rkt \
   --target brew \
   --racket-root /path/to/racket.git \
   --homebrew-tap /opt/homebrew/Library/Taps/cutiedeng/homebrew-racket \
-  --bottle-root-url https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
+  --bottle-root-url https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2
 ```
 
-The command writes `artifacts/racket-minimal-9.2.1-src.tgz` in the packaging
+The command writes `artifacts/racket-minimal-9.2.2-src.tgz` in the packaging
 project and replaces `Formula/racket@9.rb` in this tap after validation. Before
 validating the formula, upload the generated source artifact:
 
 ```text
-https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz
+https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz
 ```
 
 Then verify that the formula `sha256` matches:
 
 ```sh
-curl -L https://github.com/CutieDeng/racket/releases/download/v9.2.1/racket-minimal-9.2.1-src.tgz | shasum -a 256
+curl -L https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz | shasum -a 256
 ```
 
 Local validation:

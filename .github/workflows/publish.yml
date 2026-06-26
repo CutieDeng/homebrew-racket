@@ -39,7 +39,7 @@ jobs:
 
       - run: brew test-bot --only-tap-syntax
 
-      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
+      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2
 
       - name: List bottle files
         shell: bash
@@ -87,8 +87,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1
-          RELEASE_TAG: v9.2.1
+          BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2
+          RELEASE_TAG: v9.2.2
           BOTTLE_REBUILD: 1
         run: |
           set -euo pipefail
