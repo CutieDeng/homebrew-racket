@@ -15,11 +15,11 @@ class RacketAT9 < Formula
   end
 
   bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.1"
+    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2"
     rebuild 1
-    sha256 arm64_tahoe:  "1db90337b91294c74dcda628a3ab47b6aab5166bca474701a7b7b75ce49008a6"
-    sha256 arm64_linux:  "f1cebe4864067ab15caf3220373f133dd2200f35ceb65675ffa5efd8c5a65a2c"
-    sha256 x86_64_linux: "317bce32472dbc722b70f8e9455c39ac8f4117077307ad6616ee495be4ff2837"
+    sha256 arm64_tahoe:  "899a8955e6859036aa36993cb0194467a1d8bb61e89eae0543e1231f47f9b0e1"
+    sha256 arm64_linux:  "d7b889d67047cc841ac13ebe56e5f2c78737f92c277f8500ff8f413a9c2470c3"
+    sha256 x86_64_linux: "35992b7a799333464b9b72043508cc54a70677e731cde5dbd759b1daf0dc6aea"
   end
 
   depends_on "openssl@3"
