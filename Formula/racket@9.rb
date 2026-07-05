@@ -6,20 +6,12 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz"
-  version "9.2.2.1"
-  sha256 "ecd74fcdab8d44816e2d9dd4f995de875d6b888367ee1ddef32bc06f25e4ac09"
+  version "9.2.2.2"
+  sha256 "fc25e3ca9996f96b41edac3ab2d1517a8c42e2d0ed9107b81252bcd62895669e"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2"
-    rebuild 1
-    sha256 arm64_tahoe:  "899a8955e6859036aa36993cb0194467a1d8bb61e89eae0543e1231f47f9b0e1"
-    sha256 arm64_linux:  "d7b889d67047cc841ac13ebe56e5f2c78737f92c277f8500ff8f413a9c2470c3"
-    sha256 x86_64_linux: "35992b7a799333464b9b72043508cc54a70677e731cde5dbd759b1daf0dc6aea"
   end
 
   depends_on "openssl@3"
@@ -117,6 +109,7 @@ class RacketAT9 < Formula
     assert_match "9.2.2", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
+    assert !Dir["#{prefix}/var/cache/racket/compiled/**/*.zo"].empty?, "system compiled cache is empty"
 
     empty_home = testpath/"empty-home"
     empty_home.mkpath
