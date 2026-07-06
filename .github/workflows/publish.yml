@@ -37,7 +37,7 @@ jobs:
 
       - run: brew test-bot --only-setup
 
-      - run: brew test-bot --only-tap-syntax
+      - run: brew test-bot --only-tap-syntax --tap=cutiedeng/racket
 
       - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2
 
@@ -117,7 +117,7 @@ jobs:
           fi
 
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.2.4."
+            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.2.5."
           fi
 
           release_asset_dir="${RUNNER_TEMP:-$GITHUB_WORKSPACE}/bottle-release-assets"

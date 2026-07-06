@@ -6,7 +6,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz"
-  version "9.2.2.4"
+  version "9.2.2.5"
   sha256 "fc25e3ca9996f96b41edac3ab2d1517a8c42e2d0ed9107b81252bcd62895669e"
   license any_of: ["MIT", "Apache-2.0"]
 
@@ -93,8 +93,8 @@ class RacketAT9 < Formula
 
   def system_cache_roots
     [
-      prefix/"var/cache/racket/compiled#{prefix}/share/racket/collects",
-      prefix/"var/cache/racket/compiled#{prefix}/share/racket/pkgs",
+      prefix/"var/cache/racket/compiled#{share}/racket/collects",
+      prefix/"var/cache/racket/compiled#{share}/racket/pkgs",
     ]
   end
 
@@ -103,7 +103,8 @@ class RacketAT9 < Formula
   end
 
   def setup_system_cache
-    system bin/"racket", "-N", "raco", "-l-", "raco", "setup", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
+    system bin/"racket", "-N", "raco", "-l-", "raco", "setup",
+           "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
   end
 
   def post_install
