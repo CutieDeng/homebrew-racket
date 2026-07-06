@@ -6,7 +6,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz"
-  version "9.2.2.3"
+  version "9.2.2.4"
   sha256 "fc25e3ca9996f96b41edac3ab2d1517a8c42e2d0ed9107b81252bcd62895669e"
   license any_of: ["MIT", "Apache-2.0"]
 
@@ -88,10 +88,26 @@ class RacketAT9 < Formula
 
     system bin/"raco", "setup", "--no-user", "--no-zo"
     remove_precompiled_cache
+    setup_system_cache if build.bottle?
+  end
+
+  def system_cache_roots
+    [
+      prefix/"var/cache/racket/compiled#{prefix}/share/racket/collects",
+      prefix/"var/cache/racket/compiled#{prefix}/share/racket/pkgs",
+    ]
+  end
+
+  def system_cache_populated?
+    system_cache_roots.all? { |root| !Dir["#{root}/**/compiled/*.zo"].empty? }
+  end
+
+  def setup_system_cache
+    system bin/"racket", "-N", "raco", "-l-", "raco", "setup", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
   end
 
   def post_install
-    system bin/"raco", "setup", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
+    setup_system_cache unless system_cache_populated?
   end
 
   def remove_precompiled_cache
@@ -117,7 +133,7 @@ class RacketAT9 < Formula
     assert_match "9.2.2", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
-    assert !Dir["#{prefix}/var/cache/racket/compiled/**/*.zo"].empty?, "system compiled cache is empty"
+    assert system_cache_populated?, "system compiled cache is empty"
 
     empty_home = testpath/"empty-home"
     empty_home.mkpath
