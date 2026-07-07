@@ -31,15 +31,21 @@ class RacketAT9 < Formula
     etc/"racket/config.rktd"
   end
 
-  def install
+  def system_cache_root
+    prefix/"var/cache/racket/compiled"
+  end
+
+  def configure_racket
     # Configure racket's package tool (raco) to use installation scope.
     config_entries = [
       "(default-scope . \"installation\")",
       "(compiled-file-cache-roots . (user system))",
-      "(compiled-file-system-cache-root . \"#{prefix}/var/cache/racket/compiled\")",
+      "(compiled-file-system-cache-root . \"#{system_cache_root}\")",
     ].join(" ")
-    inreplace "etc/config.rktd", /\)\)\n$/, ") " + config_entries + ")\n"
+    inreplace racket_config, /\)\)\n$/, ") " + config_entries + ")\n"
+  end
 
+  def install
     # Prefer Homebrew OpenSSL 3 over older OpenSSL variants.
     inreplace %w[libssl.rkt libcrypto.rkt].map { |file| buildpath/"collects/openssl"/file },
               '"1.1"', '"3"'
@@ -79,8 +85,11 @@ class RacketAT9 < Formula
     end
 
     system bin/"raco", "setup", "--no-user", "--no-zo"
-    remove_precompiled_cache
-    setup_system_cache if build.bottle?
+    configure_racket
+    if build.bottle?
+      setup_system_cache
+      remove_precompiled_cache
+    end
   end
 
   def system_cache_roots
@@ -104,18 +113,34 @@ class RacketAT9 < Formula
   end
 
   def setup_system_cache
-    system bin/"racket", "-N", "raco", "-l-", "raco", "setup",
+    system_cache_root.mkpath
+    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "raco", "-l-", "raco", "setup",
            "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
-    system bin/"racket", "-N", "rhombus", "-l-", "rhombus/run.rhm",
-           "-e", "println(\"package-racket-rhombus-cache\")"
+    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
+           "-l-", "rhombus/run.rhm", "--version"
+    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
+           "-l-", "rhombus/run.rhm", "-e", "println(\"package-racket-rhombus-cache\")"
   end
 
   def post_install
     setup_system_cache unless system_cache_populated?
+    remove_precompiled_cache
+  end
+
+  def preserve_compiled_cache_dir?(path)
+    path = Pathname(path).cleanpath
+    preserved_roots = [system_cache_root, rhombus_demod_cache].map(&:cleanpath)
+    preserved_roots.any? do |root|
+      path == root || path.to_s.start_with?("#{root}/") || root.to_s.start_with?("#{path}/")
+    end
   end
 
   def remove_precompiled_cache
-    rm_r Dir["#{prefix}/**/compiled"].sort_by(&:length).reverse
+    Dir["#{prefix}/**/compiled"].sort_by(&:length).reverse_each do |dir|
+      next if preserve_compiled_cache_dir?(dir)
+
+      rm_r dir
+    end
   end
 
   def caveats
