@@ -6,20 +6,12 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz"
-  version "9.2.2.5"
+  version "9.2.2.6"
   sha256 "fc25e3ca9996f96b41edac3ab2d1517a8c42e2d0ed9107b81252bcd62895669e"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2"
-    rebuild 1
-    sha256 arm64_tahoe:  "084ad30ebc12f74250fdbceef273e50df1259516a88a29f61e122167a09fd9db"
-    sha256 arm64_linux:  "e136449956eff58e5d49cb84f79122b78319d1b6185e0865c7dedb20b291e15f"
-    sha256 x86_64_linux: "29b8e67dd48ec248cd13949facf824865cfe61b5cd4d07697d94e17d32f2f99b"
   end
 
   depends_on "openssl@3"
@@ -99,12 +91,23 @@ class RacketAT9 < Formula
   end
 
   def system_cache_populated?
-    system_cache_roots.all? { |root| !Dir["#{root}/**/compiled/*.zo"].empty? }
+    system_cache_roots.all? { |root| !Dir["#{root}/**/compiled/*.zo"].empty? } &&
+      rhombus_demod_cache_populated?
+  end
+
+  def rhombus_demod_cache
+    prefix/"share/racket/pkgs/rhombus-lib/rhombus/private/compiled/ephemeral/demod"
+  end
+
+  def rhombus_demod_cache_populated?
+    !Dir["#{rhombus_demod_cache}/**/compiled/*.zo"].empty?
   end
 
   def setup_system_cache
     system bin/"racket", "-N", "raco", "-l-", "raco", "setup",
            "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
+    system bin/"racket", "-N", "rhombus", "-l-", "rhombus/run.rhm",
+           "-e", "println(\"package-racket-rhombus-cache\")"
   end
 
   def post_install
@@ -135,6 +138,7 @@ class RacketAT9 < Formula
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
     assert system_cache_populated?, "system compiled cache is empty"
+    assert rhombus_demod_cache_populated?, "Rhombus demod cache is empty"
 
     empty_home = testpath/"empty-home"
     empty_home.mkpath
