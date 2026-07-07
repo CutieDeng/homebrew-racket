@@ -36,13 +36,22 @@ class RacketAT9 < Formula
   end
 
   def configure_racket
-    # Configure racket's package tool (raco) to use installation scope.
     config_entries = [
       "(default-scope . \"installation\")",
       "(compiled-file-cache-roots . (user system))",
       "(compiled-file-system-cache-root . \"#{system_cache_root}\")",
     ].join(" ")
-    inreplace racket_config, /\)\)\n$/, ") " + config_entries + ")\n"
+    content = racket_config.read
+    %w[
+      default-scope
+      compiled-file-cache-roots
+      compiled-file-system-cache-root
+    ].each do |key|
+      content = content.gsub(/\s*\(#{Regexp.escape(key)}\s+\.\s+(?:"[^"]*"|\([^)]*\)|[^\s)]*)\)/, "")
+    end
+    raise "could not append Racket config entries" unless content.sub!(/\)\s*\z/, " #{config_entries})\n")
+
+    racket_config.write content
   end
 
   def install
@@ -115,7 +124,7 @@ class RacketAT9 < Formula
   def setup_system_cache
     system_cache_root.mkpath
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "raco", "-l-", "raco", "setup",
-           "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps"
+           "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
            "-l-", "rhombus/run.rhm", "--version"
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
