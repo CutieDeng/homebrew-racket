@@ -124,7 +124,7 @@ class RacketAT9 < Formula
   def setup_system_cache
     system_cache_root.mkpath
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "raco", "-l-", "raco", "setup",
-           "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
+           "-j", "1", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
            "-l-", "rhombus/run.rhm", "--version"
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
