@@ -35,13 +35,17 @@ class RacketAT9 < Formula
     prefix/"var/cache/racket/compiled"
   end
 
-  def configure_racket
+  def source_racket_config
+    buildpath/"etc/config.rktd"
+  end
+
+  def configure_racket(config_path)
     config_entries = [
       "(default-scope . \"installation\")",
       "(compiled-file-cache-roots . (user system))",
       "(compiled-file-system-cache-root . \"#{system_cache_root}\")",
     ].join(" ")
-    content = racket_config.read
+    content = config_path.read
     %w[
       default-scope
       compiled-file-cache-roots
@@ -51,13 +55,15 @@ class RacketAT9 < Formula
     end
     raise "could not append Racket config entries" unless content.sub!(/\)\s*\z/, " #{config_entries})\n")
 
-    racket_config.write content
+    config_path.atomic_write content
   end
 
   def install
     # Prefer Homebrew OpenSSL 3 over older OpenSSL variants.
     inreplace %w[libssl.rkt libcrypto.rkt].map { |file| buildpath/"collects/openssl"/file },
               '"1.1"', '"3"'
+
+    configure_racket source_racket_config
 
     cd "src" do
       args = %W[
@@ -94,7 +100,6 @@ class RacketAT9 < Formula
     end
 
     system bin/"raco", "setup", "--no-user", "--no-zo"
-    configure_racket
     if build.bottle?
       setup_system_cache
       remove_precompiled_cache
