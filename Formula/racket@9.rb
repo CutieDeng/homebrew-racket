@@ -121,10 +121,27 @@ class RacketAT9 < Formula
     !Dir["#{rhombus_demod_cache}/**/compiled/*.zo"].empty?
   end
 
+  def with_setup_bootstrap_config
+    require "tmpdir"
+
+    Dir.mktmpdir("racket-setup-bootstrap-config") do |dir|
+      config_dir = Pathname(dir)
+      content = racket_config.read.gsub(/\s*\(compiled-file-cache-roots\s+\.\s+\([^)]*\)\)/, "")
+      unless content.include?("compiled-file-system-cache-root")
+        raise "could not prepare Racket setup bootstrap config"
+      end
+
+      (config_dir/"config.rktd").write content
+      yield config_dir
+    end
+  end
+
   def setup_system_cache
     system_cache_root.mkpath
-    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "raco", "-l-", "raco", "setup",
-           "-j", "1", "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
+    with_setup_bootstrap_config do |config_dir|
+      system bin/"racket", "-U", "-G", config_dir.to_s, "-N", "raco", "-l-", "raco", "setup",
+             "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
+    end
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
            "-l-", "rhombus/run.rhm", "--version"
     system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
