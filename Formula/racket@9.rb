@@ -14,6 +14,14 @@ class RacketAT9 < Formula
     skip "Private Racket fork releases are managed manually"
   end
 
+  bottle do
+    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2"
+    rebuild 1
+    sha256 arm64_tahoe:  "b36a77bfe6ee9c843f143114c134c52022498b0efac0a0ae1a9d9006a8a9aea8"
+    sha256 arm64_linux:  "de60336c264826e704f607f5d5676935dccad69cf96ac0f6a94d15fee2f78867"
+    sha256 x86_64_linux: "0912d7dd93ee029ac639e7a4d499f3ea5d2f4a6cd684d3838e316eda08c270b9"
+  end
+
   depends_on "openssl@3"
 
   uses_from_macos "libffi"
