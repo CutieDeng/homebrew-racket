@@ -6,20 +6,12 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.2/racket-minimal-9.2.2-src.tgz"
-  version "9.2.2.6"
+  version "9.2.2.7"
   sha256 "fc25e3ca9996f96b41edac3ab2d1517a8c42e2d0ed9107b81252bcd62895669e"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.2"
-    rebuild 1
-    sha256 arm64_tahoe:  "b36a77bfe6ee9c843f143114c134c52022498b0efac0a0ae1a9d9006a8a9aea8"
-    sha256 arm64_linux:  "de60336c264826e704f607f5d5676935dccad69cf96ac0f6a94d15fee2f78867"
-    sha256 x86_64_linux: "0912d7dd93ee029ac639e7a4d499f3ea5d2f4a6cd684d3838e316eda08c270b9"
   end
 
   depends_on "openssl@3"
@@ -117,16 +109,7 @@ class RacketAT9 < Formula
   end
 
   def system_cache_populated?
-    system_cache_roots.all? { |root| !Dir["#{root}/**/compiled/*.zo"].empty? } &&
-      rhombus_demod_cache_populated?
-  end
-
-  def rhombus_demod_cache
-    prefix/"share/racket/pkgs/rhombus-lib/rhombus/private/compiled/ephemeral/demod"
-  end
-
-  def rhombus_demod_cache_populated?
-    !Dir["#{rhombus_demod_cache}/**/compiled/*.zo"].empty?
+    system_cache_roots.all? { |root| !Dir["#{root}/**/compiled/*.zo"].empty? }
   end
 
   def with_setup_bootstrap_config
@@ -163,7 +146,7 @@ class RacketAT9 < Formula
 
   def preserve_compiled_cache_dir?(path)
     path = Pathname(path).cleanpath
-    preserved_roots = [system_cache_root, rhombus_demod_cache].map(&:cleanpath)
+    preserved_roots = [system_cache_root].map(&:cleanpath)
     preserved_roots.any? do |root|
       path == root || path.to_s.start_with?("#{root}/") || root.to_s.start_with?("#{path}/")
     end
@@ -197,7 +180,6 @@ class RacketAT9 < Formula
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
     assert system_cache_populated?, "system compiled cache is empty"
-    assert rhombus_demod_cache_populated?, "Rhombus demod cache is empty"
 
     empty_home = testpath/"empty-home"
     empty_home.mkpath
