@@ -6,7 +6,7 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.3/racket-minimal-9.2.3-src.tgz"
-  version "9.2.3"
+  version "9.2.3.1"
   sha256 "209cd0bfadcb1e29157d0d10c379fb5aa2b244a82c63f694c3342f9958f9b467"
   license any_of: ["MIT", "Apache-2.0"]
 
@@ -155,6 +155,7 @@ class RacketAT9 < Formula
   def remove_precompiled_cache
     Dir["#{prefix}/**/compiled"].sort_by(&:length).reverse_each do |dir|
       next if preserve_compiled_cache_dir?(dir)
+      next if dir.end_with?("/info-domain/compiled")
 
       rm_r dir
     end
