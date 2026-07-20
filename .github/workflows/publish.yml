@@ -39,7 +39,7 @@ jobs:
 
       - run: brew test-bot --only-tap-syntax --tap=cutiedeng/racket
 
-      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.3
+      - run: brew test-bot --only-formulae --testing-formulae=racket@9 --skip-dependents --root-url=https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.4
 
       - name: List bottle files
         shell: bash
@@ -87,9 +87,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.3
-          RELEASE_TAG: v9.2.3
-          RELEASE_NAME: Racket 9.2.3 Homebrew bottles
+          BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.4
+          RELEASE_TAG: v9.2.4
+          RELEASE_NAME: Racket 9.2.4 Homebrew bottles
           BOTTLE_REBUILD: 1
         run: |
           set -euo pipefail
@@ -117,7 +117,7 @@ jobs:
           fi
 
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.3."
+            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.4.1."
           fi
 
           release_asset_dir="${RUNNER_TEMP:-$GITHUB_WORKSPACE}/bottle-release-assets"

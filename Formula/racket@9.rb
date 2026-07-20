@@ -5,24 +5,14 @@
 class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
-  url "https://github.com/CutieDeng/racket/releases/download/v9.2.3/racket-minimal-9.2.3-src.tgz"
-  version "9.2.3.3"
-  sha256 "d2ed2f51777c01b9ea92db3fcee49f7ad5617ec7eebc633c0d845d9e178fb93c"
+  url "https://github.com/CutieDeng/racket/releases/download/v9.2.4/racket-minimal-9.2.4-src.tgz"
+  version "9.2.4.1"
+  sha256 "3e7ef3bbc859fea44f7840dd2b252a54b732ed8ed0caaf40db28c3932b68b99e"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
   end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.2.3"
-    rebuild 1
-    sha256 arm64_tahoe:  "983f6210bd71083f9a4b5d44a7e6ce7a97cb2e76310166cc1643de6936d0b32a"
-    sha256 arm64_linux:  "1f0c06e236367f58240773e14e27a301f5765dd5eb3bca80a9221d59fe9008c5"
-    sha256 x86_64_linux: "79240ace96d785d1fdc1f7012f8e433884cff37c4269d1bca706415260ab982c"
-  end
-
-  depends_on "openssl@3"
 
   uses_from_macos "libffi"
 
@@ -30,6 +20,12 @@ class RacketAT9 < Formula
     depends_on "libedit"
     depends_on "ncurses"
     depends_on "zlib-ng-compat"
+  end
+
+  # arm64 Racket runs crypto+TLS on the in-tree rktcrypto engine and loads no
+  # OpenSSL; Intel builds still carry it pending rktcrypto perf validation.
+  on_intel do
+    depends_on "openssl@3"
   end
 
   # These files are amended when packages are installed or removed.
@@ -63,10 +59,6 @@ class RacketAT9 < Formula
   end
 
   def install
-    # Prefer Homebrew OpenSSL 3 over older OpenSSL variants.
-    inreplace %w[libssl.rkt libcrypto.rkt].map { |file| buildpath/"collects/openssl"/file },
-              '"1.1"', '"3"'
-
     cd "src" do
       args = %W[
         --disable-debug
@@ -80,14 +72,16 @@ class RacketAT9 < Formula
         --enable-useprefix
       ]
 
-      ENV["LDFLAGS"] = "-rpath #{formula_opt_lib("openssl@3")}"
-      ENV["LDFLAGS"] = "-Wl,-rpath=#{formula_opt_lib("openssl@3")}" if OS.linux?
+      if Hardware::CPU.intel?
+        ENV["LDFLAGS"] = "-rpath #{formula_opt_lib("openssl@3")}"
+        ENV["LDFLAGS"] = "-Wl,-rpath=#{formula_opt_lib("openssl@3")}" if OS.linux?
+      end
 
       system "./configure", *args
       system "make"
       system "make", "install"
 
-      if OS.mac?
+      if OS.mac? && Hardware::CPU.intel?
         openssl_opt_lib = formula_opt_lib("openssl@3")
         racket_libdir = lib/"racket"
 
@@ -185,7 +179,7 @@ class RacketAT9 < Formula
     require "pty"
     require "timeout"
 
-    assert_match "9.2.3", shell_output("#{bin}/racket -e '(displayln (version))'")
+    assert_match "9.2.4", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
     assert system_cache_populated?, "system compiled cache is empty"
@@ -224,7 +218,7 @@ class RacketAT9 < Formula
     assert_match "3", output
 
     output = shell_output("printf '1\\n' | #{bin}/racket")
-    assert_match "Welcome to Racket v9.2.3 [cs].", output
+    assert_match "Welcome to Racket v9.2.4 [cs].", output
     assert_match(/^> 1$/, output)
 
     output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
@@ -259,19 +253,26 @@ class RacketAT9 < Formula
         Process.detach(pid)
       end
     end
-    assert_match "Welcome to Racket v9.2.3 [cs].", pty_output
+    assert_match "Welcome to Racket v9.2.4 [cs].", pty_output
     assert_match "\n#t", pty_output
     refute_match(/no readline support/, pty_output)
     assert !pty_output.match?(/> \r?\n\(/), "empty input fell back to the plain REPL reader"
 
     assert_match '(default-scope . "installation")', racket_config.read
 
+    output = shell_output("#{bin}/racket -e '(require openssl) (displayln ssl-available?)'")
+    assert_match "#t", output
+
+    # TLS runs on the in-tree rktcrypto engine: requiring openssl must not
+    # pull an OpenSSL shared library into the process on any architecture.
+    # (Apple system frameworks transitively load /usr/lib/libssl.*, so on
+    # macOS only Homebrew's OpenSSL counts as a violation.)
     if OS.mac?
       output = shell_output("DYLD_PRINT_LIBRARIES=1 #{bin}/racket -e '(require openssl)' 2>&1")
-      assert_match(%r{.*openssl@3/.*/libssl.*\.dylib}, output)
+      refute_match(%r{openssl@3/.*/lib(ssl|crypto)}, output)
     else
       output = shell_output("LD_DEBUG=libs #{bin}/racket -e '(require openssl)' 2>&1")
-      assert_match "init: #{formula_opt_lib("openssl@3")/shared_library("libssl")}", output
+      refute_match(/libssl|libcrypto/, output)
     end
   end
 end
