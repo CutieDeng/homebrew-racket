@@ -7,7 +7,7 @@ class RacketAT9 < Formula
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.4/racket-minimal-9.2.4-src.tgz"
   version "9.2.4.1"
-  sha256 "3e7ef3bbc859fea44f7840dd2b252a54b732ed8ed0caaf40db28c3932b68b99e"
+  sha256 "575d3effebea84a8e0595a134d597c61d1472503ef017cc42bc20d22d8e09202"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
