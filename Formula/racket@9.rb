@@ -6,8 +6,8 @@ class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.2.4/racket-minimal-9.2.4-src.tgz"
-  version "9.2.4.2"
-  sha256 "ad36e0fbcdbcd577e9f02c7ef6adc3ae09c3733deee16d5f193610d396ec446c"
+  version "9.2.4.3"
+  sha256 "a1b4c1acc5ba2ccd5373c09926afe0ad4ce4010d8564234b15699340f8605956"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
