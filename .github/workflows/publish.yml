@@ -117,7 +117,7 @@ jobs:
           fi
 
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.4.1."
+            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.2.4.2."
           fi
 
           release_asset_dir="${RUNNER_TEMP:-$GITHUB_WORKSPACE}/bottle-release-assets"
