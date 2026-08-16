@@ -7,20 +7,13 @@ class RacketAT9 < Formula
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.3.1/racket-minimal-9.3.1-src.tgz"
   version "9.3.1.1"
-  sha256 "37e123e66026b76942a612b9e34b5f2380b44891633c7152e8933360f44fae94"
+  sha256 "2de98df196ba648fc8ae560e720cb2c01058ecfdd2c48746e6373d122f9a2e6f"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
   end
 
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.3.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "02095410c9251935ef88709c8ffb71d831dc9f0d02c88c00eb373415966a8be7"
-    sha256 arm64_linux:  "5a6a3074f95ab6c5a0bf71d104f63b3bd89e2594d5ab29216305e55e824ec68f"
-    sha256 x86_64_linux: "d26429ca67975ff1509375a07370e53209198925af420e2ad42916f9e145518e"
-  end
 
   uses_from_macos "libffi"
 
