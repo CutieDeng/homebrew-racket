@@ -14,7 +14,6 @@ class RacketAT9 < Formula
     skip "Private Racket fork releases are managed manually"
   end
 
-
   uses_from_macos "libffi"
 
   on_linux do
