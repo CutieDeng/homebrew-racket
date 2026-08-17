@@ -5,9 +5,9 @@
 class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
-  url "https://github.com/CutieDeng/racket/releases/download/v9.3.1/racket-minimal-9.3.1-src.tgz"
-  version "9.3.1.2"
-  sha256 "82c5ea4c2e406b14b69ff7255ee34358f4abb0c1eee635e256562a0ca816f85d"
+  url "https://github.com/CutieDeng/racket/releases/download/v9.3.2/racket-minimal-9.3.2-src.tgz"
+  version "9.3.2.1"
+  sha256 "2499b909816914168e0c61d22da7274dbc503ef3dcff32d9811c24b3a7d1d360"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
@@ -183,7 +183,7 @@ class RacketAT9 < Formula
     require "pty"
     require "timeout"
 
-    assert_match "9.3.1", shell_output("#{bin}/racket -e '(displayln (version))'")
+    assert_match "9.3.2", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
     assert system_cache_populated?, "system compiled cache is empty"
@@ -209,7 +209,7 @@ class RacketAT9 < Formula
     assert_match "interactive-packages-ok", output
 
     output = shell_output("printf '1\\n' | #{bin}/racket")
-    assert_match "Welcome to Racket v9.3.1 [cs].", output
+    assert_match "Welcome to Racket v9.3.2 [cs].", output
     assert_match(/^> 1$/, output)
 
     output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
@@ -244,7 +244,7 @@ class RacketAT9 < Formula
         Process.detach(pid)
       end
     end
-    assert_match "Welcome to Racket v9.3.1 [cs].", pty_output
+    assert_match "Welcome to Racket v9.3.2 [cs].", pty_output
     assert_match "\n#t", pty_output
     refute_match(/no readline support/, pty_output)
     assert !pty_output.match?(/> \r?\n\(/), "empty input fell back to the plain REPL reader"
