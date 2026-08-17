@@ -17,9 +17,9 @@ class RacketAT9 < Formula
   bottle do
     root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.3.1"
     rebuild 1
-    sha256 arm64_tahoe:  "4e1060456b00eaccc7783c9f0bc3ede79f24acb0a18dfed1a5f95df665883f28"
-    sha256 arm64_linux:  "7c3d831982e369be33b94609825a44482cf22bebd75e2b8d4cc6e2a876ed1e26"
-    sha256 x86_64_linux: "cc0db8af6f7e0c5ec70897e9bb70c27ca8071bc5a25eb75a3fec8affee2d37e0"
+    sha256 arm64_tahoe:  "461ace8fb633e1bfbbf182a7e2420728b53812e6a46b796057ba7c46eec7bb60"
+    sha256 arm64_linux:  "6353bc84a3b687ce105b8d117c645e8b78585adca0915a8ac1cfabc9db4ae240"
+    sha256 x86_64_linux: "55e56fce7a650fc3e4d66d0652f513cfb99fd5edfd4f0c7b6c4de34620940a7c"
   end
 
   uses_from_macos "libffi"
