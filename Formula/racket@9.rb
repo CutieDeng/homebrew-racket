@@ -7,19 +7,11 @@ class RacketAT9 < Formula
   homepage "https://racket-lang.org/"
   url "https://github.com/CutieDeng/racket/releases/download/v9.3.1/racket-minimal-9.3.1-src.tgz"
   version "9.3.1.1"
-  sha256 "2de98df196ba648fc8ae560e720cb2c01058ecfdd2c48746e6373d122f9a2e6f"
+  sha256 "82c5ea4c2e406b14b69ff7255ee34358f4abb0c1eee635e256562a0ca816f85d"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/v9.3.1"
-    rebuild 1
-    sha256 arm64_tahoe:  "461ace8fb633e1bfbbf182a7e2420728b53812e6a46b796057ba7c46eec7bb60"
-    sha256 arm64_linux:  "6353bc84a3b687ce105b8d117c645e8b78585adca0915a8ac1cfabc9db4ae240"
-    sha256 x86_64_linux: "55e56fce7a650fc3e4d66d0652f513cfb99fd5edfd4f0c7b6c4de34620940a7c"
   end
 
   uses_from_macos "libffi"
@@ -143,10 +135,6 @@ class RacketAT9 < Formula
       system bin/"racket", "-U", "-G", config_dir.to_s, "-N", "raco", "-l-", "raco", "setup",
              "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
     end
-    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
-           "-l-", "rhombus/run.rhm", "--version"
-    system bin/"racket", "-U", "-R", system_cache_root.to_s, "-N", "rhombus",
-           "-l-", "rhombus/run.rhm", "-e", "println(\"package-racket-rhombus-cache\")"
   end
 
   def post_install
@@ -211,19 +199,6 @@ class RacketAT9 < Formula
     RACKET
     output = shell_output("#{bin}/racket #{testpath/"interactive-packages.rkt"}")
     assert_match "interactive-packages-ok", output
-
-    (testpath/"rhombus-smoke.rhm").write <<~RHOMBUS
-      #lang rhombus
-      println("rhombus-lang-ok")
-    RHOMBUS
-    output = shell_output("#{bin}/racket #{testpath/"rhombus-smoke.rhm"}")
-    assert_match "rhombus-lang-ok", output
-
-    output = shell_output("#{bin}/rhombus --version")
-    assert_match "Welcome to Rhombus v", output
-
-    output = shell_output("#{bin}/rhombus -e '1 + 2'")
-    assert_match "3", output
 
     output = shell_output("printf '1\\n' | #{bin}/racket")
     assert_match "Welcome to Racket v9.3.1 [cs].", output
