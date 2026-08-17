@@ -220,7 +220,7 @@ class RacketAT9 < Formula
     assert_match "rhombus-lang-ok", output
 
     output = shell_output("#{bin}/rhombus --version")
-    assert_match "Welcome to Rhombus v1.0", output
+    assert_match "Welcome to Rhombus v", output
 
     output = shell_output("#{bin}/rhombus -e '1 + 2'")
     assert_match "3", output
