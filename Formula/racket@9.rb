@@ -5,21 +5,13 @@
 class RacketAT9 < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
-  url "https://github.com/CutieDeng/racket/releases/download/release-9.3.12/racket-minimal-9.3.12-src.tgz"
-  version "9.3.12.1"
-  sha256 "624f8ecf84b2326c547282597478643956f44a9e33b63b8078d4daf1db8d228a"
+  url "https://github.com/CutieDeng/racket/releases/download/release-9.3.13/racket-minimal-9.3.13-src.tgz"
+  version "9.3.13.1"
+  sha256 "bdf20fa23be83762013376d764884f08070175a3f35b6a6ebc62a5a66f0a15d0"
   license any_of: ["MIT", "Apache-2.0"]
 
   livecheck do
     skip "Private Racket fork releases are managed manually"
-  end
-
-  bottle do
-    root_url "https://github.com/CutieDeng/homebrew-racket/releases/download/release-9.3.12"
-    rebuild 1
-    sha256 arm64_tahoe:  "3573bcacd3db896a7425c6341a466b5b8268f55f1011b705595efe1b318a7e49"
-    sha256 arm64_linux:  "2b9aa74d892f93b22fc67475dbc4d8421920795ea5e0d1baf5c2d2da2c81d7fc"
-    sha256 x86_64_linux: "a8bbb3b3f429043830877492ac3551a276d1faed8a3b0340084fcbb33b7ba046"
   end
 
   uses_from_macos "libffi"
@@ -180,7 +172,7 @@ class RacketAT9 < Formula
     require "pty"
     require "timeout"
 
-    assert_match "9.3.12", shell_output("#{bin}/racket -e '(displayln (version))'")
+    assert_match "9.3.13", shell_output("#{bin}/racket -e '(displayln (version))'")
     output = shell_output("#{bin}/racket -e '(require racket/pvector) (displayln (pvector->list (pvector 1 2 3)))'")
     assert_match "(1 2 3)", output
     assert system_cache_populated?, "system compiled cache is empty"
@@ -206,7 +198,7 @@ class RacketAT9 < Formula
     assert_match "interactive-packages-ok", output
 
     output = shell_output("printf '1\\n' | #{bin}/racket")
-    assert_match "Welcome to Racket v9.3.12 [cs].", output
+    assert_match "Welcome to Racket v9.3.13 [cs].", output
     assert_match(/^> 1$/, output)
 
     output = shell_output("printf 'f\"hi\"\\n' | #{bin}/racket")
@@ -241,7 +233,7 @@ class RacketAT9 < Formula
         Process.detach(pid)
       end
     end
-    assert_match "Welcome to Racket v9.3.12 [cs].", pty_output
+    assert_match "Welcome to Racket v9.3.13 [cs].", pty_output
     assert_match "\n#t", pty_output
     refute_match(/no readline support/, pty_output)
     assert !pty_output.match?(/> \r?\n\(/), "empty input fell back to the plain REPL reader"
