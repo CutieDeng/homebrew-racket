@@ -97,10 +97,12 @@ class RacketAT9 < Formula
 
     system bin/"raco", "setup", "--no-user", "--no-zo"
     configure_racket
-    if build.bottle?
-      setup_system_cache
-      remove_precompiled_cache
-    end
+    # Bottles and source builds alike populate the system compiled cache and
+    # prune ordinary compiled directories here: Homebrew rejects
+    # `post_install` (FormulaAudit/InstallSteps) and its step DSL cannot
+    # express the globbing and filtered removal below.
+    setup_system_cache
+    remove_precompiled_cache
   end
 
   def system_cache_roots
@@ -135,11 +137,6 @@ class RacketAT9 < Formula
       system bin/"racket", "-U", "-G", config_dir.to_s, "-N", "raco", "-l-", "raco", "setup",
              "--system", "--no-user", "--reset-cache", "-D", "--no-pkg-deps", "--no-launcher"
     end
-  end
-
-  def post_install
-    setup_system_cache unless system_cache_populated?
-    remove_precompiled_cache
   end
 
   def preserve_compiled_cache_dir?(path)
