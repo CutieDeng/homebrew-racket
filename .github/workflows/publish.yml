@@ -90,7 +90,7 @@ jobs:
           BOTTLE_ROOT_URL: https://github.com/CutieDeng/homebrew-racket/releases/download/release-9.3.14
           RELEASE_TAG: release-9.3.14
           RELEASE_NAME: Racket 9.3.14 Homebrew bottles
-          BOTTLE_REBUILD: 1
+          BOTTLE_REBUILD: 2
         run: |
           set -euo pipefail
 
@@ -117,7 +117,7 @@ jobs:
           fi
 
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.3.14.1."
+            gh release create "$RELEASE_TAG" --title "$RELEASE_NAME" --notes "Generated Homebrew bottle artifacts for racket@9 9.3.14.2."
           fi
 
           release_asset_dir="${RUNNER_TEMP:-$GITHUB_WORKSPACE}/bottle-release-assets"
